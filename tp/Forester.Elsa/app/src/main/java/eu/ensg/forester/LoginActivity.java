@@ -13,6 +13,13 @@ import android.widget.Toast;
 
 import java.io.IOException;
 
+import eu.ensg.forester.data.ForesterSpatialiteOpenHelper;
+import eu.ensg.spatialite.SpatialiteDatabase;
+import eu.ensg.spatialite.SpatialiteOpenHelper;
+import jsqlite.Database;
+import jsqlite.Exception;
+import jsqlite.Stmt;
+
 
 public class LoginActivity extends AppCompatActivity implements Constants {
 
@@ -23,6 +30,9 @@ public class LoginActivity extends AppCompatActivity implements Constants {
 
     // les préférences
     private SharedPreferences preferences;
+
+    // la database
+    private SpatialiteDatabase database;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,8 +78,34 @@ public class LoginActivity extends AppCompatActivity implements Constants {
 
     // renvoie l'activité de l'application
     private void login_onClick(View view) {
-        Intent intent = new Intent(this, MapsActivity.class);
-        startActivity(intent);
+        String serial = editSerial.getText().toString();
+        try{
+            // test si le serial est dans la base de données
+            Stmt stmt = database.prepare("SELECT * FROM Forester where Serial = "+
+                    DatabaseUtils.sqlEscapeString(serial));
+            if (stmt.step()){
+                int foresterID = stmt.column_int(0);
+                stmt.close();
+
+                // garder le serial en mémoire de l'appareil
+                SharedPreferences.Editor editor = preferences.edit();
+                editor.putString(PREFERENCE_SERIAL, serial);
+                editor.commit();
+                editor.apply();
+
+                // envoie de l'activité si c'est le cas
+                Intent intent = new Intent(this, MapsActivity.class);
+                intent.putExtra(EXTRA_FORESTER_ID, foresterID);
+                startActivity(intent);
+            }else{
+                Toast.makeText(this, R.string.usernotfind, Toast.LENGTH_LONG).show();
+                Intent intent = new Intent(this, CreateUserActivity.class);
+                startActivity(intent);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
     // renvoie l'activité de création de compte
@@ -79,7 +115,13 @@ public class LoginActivity extends AppCompatActivity implements Constants {
     }
 
     private void initDatabase() {
-
+        SpatialiteOpenHelper helper = null;
+        try{
+            helper = new ForesterSpatialiteOpenHelper(this);
+            database = helper.getDatabase();
+        } catch (Exception | IOException e) {
+            e.printStackTrace();
+        }
 
     }
 }
