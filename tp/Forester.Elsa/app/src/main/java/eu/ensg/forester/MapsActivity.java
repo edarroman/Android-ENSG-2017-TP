@@ -32,13 +32,18 @@ import eu.ensg.spatialite.geom.Point;
 import eu.ensg.spatialite.geom.Polygon;
 import eu.ensg.spatialite.geom.XY;
 
+import static eu.ensg.forester.Constants.EXTRA_FORESTER_ID;
+
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, LocationListener {
+
 
     private GoogleMap mMap;
     private Point currentPosition;
     private TextView lblPosition;
     private Polygon currentSector;
     private com.google.android.gms.maps.model.Polygon currentDrawPolygon;
+
+    private int foresterID;
 
     boolean isRecording = false;
 
@@ -56,6 +61,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         buttonAbort = (Button)findViewById (R.id.abort);
         layoutSector = findViewById(R.id.layout_sector);
 
+        // On récupère le serial
+        foresterID = getIntent().getIntExtra(EXTRA_FORESTER_ID, -1);
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()

@@ -52,11 +52,11 @@ public class CreateUserActivity extends AppCompatActivity implements Constants {
 
     private void create_onClick(View view) {
         try{
-            database.exec("INSERT INTO Forester (firstName, lastName, serial) "+
+            database.exec("INSERT INTO Forester (firstName, lastName, serial) " +
                     "VALUES ('"+
-                    editFirstName.getText().toString()+ "', '"+
-                    editLastName.getText().toString()+ "', "+
-                    editSerial.getText().toString()+ ")");
+                    DatabaseUtils.sqlEscapeString(editFirstName.getText().toString())+ ", "+
+                    DatabaseUtils.sqlEscapeString(editLastName.getText().toString())+ ", "+
+                    DatabaseUtils.sqlEscapeString(editSerial.getText().toString())+ ")");
             //renvoie sur l'activité Login
             Intent intent = new Intent(this, LoginActivity.class);
             intent.putExtra(EXTRA_SERIAL, editSerial.getText().toString());
