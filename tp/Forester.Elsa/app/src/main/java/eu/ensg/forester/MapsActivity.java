@@ -329,10 +329,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         try {
             Stmt stmt = database.prepare("SELECT name, description, ST_asText(position) FROM PointOfInterest WHERE foresterID = " + foresterID);
             while (stmt.step()) {
-                String name = stmt.column_string(0);
-                String description = stmt.column_string(1);
                 Point position = Point.unMarshall(stmt.column_string(2));
-
                 markPOI(position);
             }
         } catch (jsqlite.Exception e) {
@@ -345,13 +342,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         try {
             Stmt stmt = database.prepare("SELECT name, ST_asText(Area) as Area FROM District WHERE foresterID = " + foresterID);
             while (stmt.step()) {
-
-                Log.w(Polygon.class.getName(), "LOAD POLYGON " + stmt.column_string(1));
-
                 Polygon polygon = Polygon.unMarshall(stmt.column_string(1));
-
-                Log.w(Polygon.class.getName(), "PARSE POLYGON " + polygon);
-
                 drawSector(polygon);
 
             }
